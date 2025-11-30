@@ -7,11 +7,13 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlin.test.assertNotEquals
 
 class GameViewModelTest
 {
     private val viewModel = GameViewModel()
 
+    //asegura que la puntuacion se actualize correctamente
     @Test
     fun gameViewModel_CorrectWordGuessed_ScoreUpdatedAndErrorFlagUnset()
     {
@@ -22,26 +24,46 @@ class GameViewModelTest
         viewModel.checkUserGuess()
 
         currentGameUiState = viewModel.uiState.value
-        // Assert that checkUserGuess() method updates isGuessedWordWrong is updated correctly.
+        // Assert que el metodo checkUserGuess() actualiza isGuessedWordWrong correctamente.
         assertFalse(currentGameUiState.isGuessedWordWrong)
-        // Assert that score is updated correctly.
+        // Assert que la puntuacion se actualiza correctamente.
         assertEquals(SCORE_AFTER_FIRST_CORRECT_ANSWER, currentGameUiState.score)
     }
     companion object {
         private const val SCORE_AFTER_FIRST_CORRECT_ANSWER = SCORE_INCREASE
     }
 
+    //confirma que la puntuacion no cambie al introducir una palabra incorrectamente
     @Test
     fun gameViewModel_IncorrectGuess_ErrorFlagSet() {
-        // Given an incorrect word as input
+        // palabra incorrecta de entrada
         val incorrectPlayerWord = "and"
 
         viewModel.updateUserGuess(incorrectPlayerWord)
         viewModel.checkUserGuess()
         val currentGameUiState = viewModel.uiState.value
-        // Assert that score is unchanged
+        // Assert que la puntuacion no ha cambiado
         assertEquals(0, currentGameUiState.score)
-        // Assert that checkUserGuess() method updates isGuessedWordWrong correctly
+        // Assert que el metodo checkUserGuess() actualiza isGuessedWordWrong correctamente
         assertTrue(currentGameUiState.isGuessedWordWrong)
+    }
+
+    // asegura que todos los elementos UI inicien en sus valores predeterminados
+    @Test
+    fun gameViewModel_Initialization_FirstWordLoaded()
+    {
+        val gameUiState = viewModel.uiState.value
+        val unScrambledWord = getUnscrambledWord(gameUiState.currentScrambledWord)
+
+        // assert de que la palabra actual esta desordenada
+        assertNotEquals(unScrambledWord, gameUiState.currentScrambledWord)
+        // assert que el recuento de palabras actual este en 1
+        assertTrue(gameUiState.currentWordCount == 1)
+        // assert de que la puntuacion inicie en 0
+        assertTrue(gameUiState.score == 0)
+        //assert de que la palabra incorrecta adivinada es falsa
+        assertFalse(gameUiState.isGuessedWordWrong)
+        // assert de que el juego no ha terminado
+        assertFalse(gameUiState.isGameOver)
     }
 }
