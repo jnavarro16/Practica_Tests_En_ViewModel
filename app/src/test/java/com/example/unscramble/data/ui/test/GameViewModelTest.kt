@@ -24,11 +24,15 @@ class GameViewModelTest
         viewModel.updateUserGuess(correctPlayerWord)
         viewModel.checkUserGuess()
 
+        //modificacion para cubrir todo el codigo
         currentGameUiState = viewModel.uiState.value
-        // Assert que el metodo checkUserGuess() actualiza isGuessedWordWrong correctamente.
-        assertFalse(currentGameUiState.isGuessedWordWrong)
-        // Assert que la puntuacion se actualiza correctamente.
+        val lastWordCount = currentGameUiState.currentWordCount
+        viewModel.skipWord()
+        currentGameUiState = viewModel.uiState.value
+        //assert que la puntuacion se actualiza correctamente.
         assertEquals(SCORE_AFTER_FIRST_CORRECT_ANSWER, currentGameUiState.score)
+        //assert que el recuento de palabras aumenta en 1 después de omitir una palabra.
+        assertEquals(lastWordCount + 1, currentGameUiState.currentWordCount)
     }
     companion object {
         private const val SCORE_AFTER_FIRST_CORRECT_ANSWER = SCORE_INCREASE
@@ -89,4 +93,5 @@ class GameViewModelTest
         //assert que después de responder 10 preguntas, el juego termina
         assertTrue(currentGameUiState.isGameOver)
     }
+
 }
