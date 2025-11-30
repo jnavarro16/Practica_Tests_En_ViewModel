@@ -1,5 +1,6 @@
 package com.example.unscramble.data.ui.test
 
+import com.example.unscramble.data.MAX_NO_OF_WORDS
 import com.example.unscramble.data.SCORE_INCREASE
 import com.example.unscramble.data.getUnscrambledWord
 import com.example.unscramble.ui.GameViewModel
@@ -65,5 +66,27 @@ class GameViewModelTest
         assertFalse(gameUiState.isGuessedWordWrong)
         // assert de que el juego no ha terminado
         assertFalse(gameUiState.isGameOver)
+    }
+
+    //simula una partida entera donde se adivinan todas las palabras
+    @Test
+    fun gameViewModel_AllWordsGuessed_UiStateUpdatedCorrectly()
+    {
+        var expectedScore = 0
+        var currentGameUiState = viewModel.uiState.value
+        var correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScrambledWord)
+        repeat(MAX_NO_OF_WORDS) {
+            expectedScore += SCORE_INCREASE
+            viewModel.updateUserGuess(correctPlayerWord)
+            viewModel.checkUserGuess()
+            currentGameUiState = viewModel.uiState.value
+            correctPlayerWord = getUnscrambledWord(currentGameUiState.currentScrambledWord)
+            //assert que depues de cada respuesta correcta, se actulize la puntuacion correctamente
+            assertEquals(expectedScore, currentGameUiState.score)
+        }
+        //assert que después de responder todas las preguntas, el recuento de palabras actual este actualizado
+        assertEquals(MAX_NO_OF_WORDS, currentGameUiState.currentWordCount)
+        //assert que después de responder 10 preguntas, el juego termina
+        assertTrue(currentGameUiState.isGameOver)
     }
 }
